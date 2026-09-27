@@ -1,0 +1,28 @@
+# Runs Main.kt on every push and pull request with the commands the
+# change was verified with.
+name: Run Main.kt
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: fwilhe2/setup-kotlin@51a059ff08b95e2b83aa952b5b46b696d5b615a0
+        with:
+          version: '2.3.10'
+      - run: |
+          kotlinc Main.kt -include-runtime -d Main.jar
+      - run: |
+          sh tests/verify-output.sh
